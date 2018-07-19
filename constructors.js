@@ -54,6 +54,12 @@ Spell.prototype.getDetails = function(){
  * @property {string} description
  */
 
+DamageSpell.prototype = Object.create(Spell.prototype);
+
+function DamageSpell(name, cost, damage, description){
+    Spell.call(this, name, cost, description);
+    this.damage = damage;
+} 
 
 
 /**
@@ -73,6 +79,14 @@ Spell.prototype.getDetails = function(){
  * @method  invoke
  */
 
+ function Spellcaster(name, health, mana){
+     this.name = name;
+     this.health = health;
+     this.mana = mana;
+     this.isAlive = true;
+     
+ }
+
   /**
    * @method inflictDamage
    *
@@ -84,6 +98,16 @@ Spell.prototype.getDetails = function(){
    * @param  {number} damage  Amount of damage to deal to the spellcaster
    */
 
+Spellcaster.prototype.inflictDamage = function(damage){
+    this.health -= damage;
+    if(this.health < 1){
+        this.isAlive = false
+        this.health = 0;
+    }else{
+        return this.health
+    }
+}
+
   /**
    * @method spendMana
    *
@@ -93,6 +117,15 @@ Spell.prototype.getDetails = function(){
    * @param  {number} cost      The amount of mana to spend.
    * @return {boolean} success  Whether mana was successfully spent.
    */
+
+Spellcaster.prototype.spendMana = function(cost){
+    if(this.mana >= cost){
+        this.mana -= cost;
+        return true
+    }else{
+        return false
+    }
+}
 
   /**
    * @method invoke
@@ -120,3 +153,57 @@ Spell.prototype.getDetails = function(){
    * @param  {Spellcaster} target         The spell target to be inflicted.
    * @return {boolean}                    Whether the spell was successfully cast.
    */
+
+Spellcaster.prototype.invoke = function(spell, target){
+    if(spell instanceof DamageSpell){
+        if(target instanceof Spellcaster){
+            if(this.mana >= spell.cost){
+                this.spendMana(spell.cost);
+                target.inflictDamage(spell.damage);
+                return true
+            }else{
+                return false
+            }
+        }else{
+            return false
+        }
+    }else if(spell instanceof Spell){
+        if(this.mana >= spell.cost){
+            this.spendMana(spell.cost);
+            return true
+        }else{
+            return false
+        }
+    }else{
+        return false
+    }
+}
+
+// Spellcaster.prototype.invoke = function(spell, target) {
+//     if((spell instanceof(DamageSpell) === true) || (spell instanceof (Spell) === true)) {
+//         if (spell instanceof(DamageSpell) === true) {
+//             if (target instanceof(Spellcaster) === true) {
+//                 if(this.mana >= spell.cost) {
+//                     this.spendMana(spell.cost);
+//                     target.inflictDamage(spell.damage);
+//                     return true;
+//                 } else {
+//                     return false;
+//                 }
+//             } else {
+//                 return false;
+//             }
+//         } else if (spell instanceof(Spell) === true) {
+//             if(this.mana >= spell.cost) {
+//              this.spendMana(spell.cost);
+//              return true;
+//             } else {
+//                 return false;
+//             }
+//         } else {
+//             return false;
+//         }
+//     } else {
+//         return false;
+//     }
+// }
